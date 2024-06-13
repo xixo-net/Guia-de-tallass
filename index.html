@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conversor de Tallas de Calzado</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        input, select, button {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            width: calc(100% - 22px);
+        }
+        button {
+            background-color: #007BFF;
+            color: #fff;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Conversor de Tallas de Calzado</h1>
+    <label for="talla">Introduce tu talla de calzado:</label>
+    <input type="number" id="talla" list="sugerencias" placeholder="Talla">
+    <datalist id="sugerencias"></datalist>
+    <label for="pais">Elige el país de origen:</label>
+    <select id="pais" onchange="actualizarSugerencias()">
+        <option value="US">EE.UU.</option>
+        <option value="EU">Europa</option>
+        <option value="UK">Reino Unido</option>
+        <option value="MX">México</option>
+    </select>
+    <button onclick="convertir()">Convertir</button>
+    <div id="result"></div>
+</div>
+
+<script>
+    const tallas = {
+        "US": [4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10, 10.5, 11, 11.5, 12],
+        "EU": [35, 35.5, 36, 37, 37.5, 38, 38.5, 39, 40, 40.5, 41, 42, 42.5, 43, 44, 44.5, 45],
+        "UK": [2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10],
+        "MX": [22, 22.5, 23, 23.5, 24, 24.5, 25, 25.5, 26, 26.5, 27, 27.5, 28, 28.5, 29, 29.5, 30]
+    };
+
+    function actualizarSugerencias() {
+        const pais = document.getElementById('pais').value;
+        const sugerencias = document.getElementById('sugerencias');
+        sugerencias.innerHTML = "";
+        tallas[pais].forEach(talla => {
+            const option = document.createElement('option');
+            option.value = talla;
+            sugerencias.appendChild(option);
+        });
+    }
+
+    const conversion = {
+        "US": {"EU": 35, "UK": 2, "MX": 22},
+        "EU": {"US": 4, "UK": 2, "MX": 22},
+        "UK": {"US": 4, "EU": 35, "MX": 22},
+        "MX": {"US": 4, "EU": 35, "UK": 2}
+    };
+
+    function convertir() {
+        const talla = parseFloat(document.getElementById('talla').value);
+        const pais = document.getElementById('pais').value;
+        const resultDiv = document.getElementById('result');
+
+        if (isNaN(talla) || talla <= 0) {
+            resultDiv.innerHTML = "<p>Por favor, introduce una talla válida.</p>";
+            return;
+        }
+
+        let result = `<p>Talla convertida:</p><ul>`;
+        const index = tallas[pais].indexOf(talla);
+        if (index !== -1) {
+            for (let [key, values] of Object.entries(tallas)) {
+                if (key !== pais) {
+                    result += `<li>${key}: ${tallas[key][index]}</li>`;
+                }
+            }
+        } else {
+            result += `<li>Talla no encontrada en las tablas de conversión.</li>`;
+        }
+        result += `</ul>`;
+
+        resultDiv.innerHTML = result;
+    }
+
+    window.onload = actualizarSugerencias;
+</script>
+
+</body>
+</html>
